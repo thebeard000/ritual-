@@ -404,6 +404,9 @@
 
 <style id="ritual-native-shell">
 /* Platform-safe native web shell: no simulated status bar or device chrome. */
+/* Legacy prototype selectors are intentionally inert on real devices. */
+.punch-hole,.gesture-indicator,.hardware-button{display:none!important;pointer-events:none!important}
+
 *,*::before,*::after{box-sizing:border-box}
 html,body{min-height:100dvh}
 body{overflow-x:hidden}
