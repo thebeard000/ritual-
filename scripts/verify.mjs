@@ -9,7 +9,9 @@ const checks = [
   ["manifest.webmanifest", /"short_name"\s*:\s*"Ritual"/],
   ["manifest.webmanifest", /"display"\s*:\s*"standalone"/],
   ["ritual-v2.js", /ritual\.profile\.v2/],
-  ["sw.js", /ritual-v4/],
+  ["ritual-v2.js", /if \(view\.querySelector\('\.ritual-v2-profile'\)\) return/],
+  ["ritual-v2.js", /new MutationObserver/],
+  ["sw.js", /ritual-v5/],
   ["capacitor.config.json", /com\.ritual\.habittracker/]
 ];
 
@@ -20,5 +22,15 @@ for (const [file, pattern] of checks) {
   console.log(pass ? "PASS" : "FAIL", file);
   ok = ok && pass;
 }
+
+if (ok) {
+  const { spawnSync } = await import("node:child_process");
+  const syntax = spawnSync(process.execPath, ["--check", "ritual-v2.js"], { encoding: "utf8" });
+  const pass = syntax.status === 0;
+  console.log(pass ? "PASS" : "FAIL", "ritual-v2.js syntax");
+  if (!pass && syntax.stderr) console.error(syntax.stderr);
+  ok = ok && pass;
+}
+
 if (!ok) process.exit(1);
 console.log("Ritual verification passed.");
