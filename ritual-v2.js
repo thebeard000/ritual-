@@ -173,7 +173,7 @@
     var perm=('Notification' in window)?Notification.permission:'unsupported';
     var modal=openModal(
       '<h2>Reminders</h2>'+
-      '<p class="small muted" style="margin-bottom:14px">Ritual uses your browser's free notification system. No notification service or subscription is used.</p>'+
+      '<p class="small muted" style="margin-bottom:14px">Ritual uses your browser&#39;s free notification system. No notification service or subscription is used.</p>'+
       '<div class="ritual-v2-field"><label for="rv-time">Daily reminder time</label><input id="rv-time" type="time" value="'+escapeHtml(r.time)+'"></div>'+
       '<label style="display:flex;gap:9px;align-items:center;margin:10px 0;font-size:13px"><input id="rv-enabled" type="checkbox" '+(r.enabled?'checked':'')+'> Enable daily reminder</label>'+
       '<div class="ritual-v2-perm"><b>Permission:</b> '+escapeHtml(perm)+
