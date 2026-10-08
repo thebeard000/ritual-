@@ -1,16 +1,9 @@
 <!doctype html>
-<!--
-  Open Design · OD Next handheld shell — Android (centered punch-hole camera, right-side volume and power keys).
-  Presentation shell for a phone-app prototype: keep the handset markup and
-  CSS, put the product inside the APP CONTENT slot (`.phone-content`). The
-  shell sets no typography, palette, spacing, or navigation for the app.
-  Derived from the Open Design mobile-app template (Apache-2.0).
--->
 <html lang="en" data-theme="dark">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#0B0E13" />
+  <meta name="theme-color" content="#090D0B" />
   <title>Ritual</title>
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="icon" type="image/svg+xml" href="brand/ritual-mark.svg" />
@@ -19,6 +12,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-title" content="Ritual" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="color-scheme" content="dark light" />
   <script>
     (function () {
       try {
@@ -30,178 +24,6 @@
       } catch (e) { document.documentElement.setAttribute('data-theme', 'dark'); }
     })();
   </script>
-  <style>
-    :root {
-      --phone-screen-width: 412px;
-      --phone-screen-height: 915px;
-      --phone-bezel: 10px;
-      --phone-outer-radius: 46px;
-      --phone-screen-radius: 38px;
-      --phone-safe-top: 52px;
-      --phone-safe-bottom: 28px;
-      --phone-system-fg: #17181a;
-      --phone-screen-bg: #f6f7f9;
-      --phone-stage-bg: #e8eaee;
-    }
-
-    * { box-sizing: border-box; }
-    html, body { margin: 0; min-height: 100%; }
-    body {
-      min-height: 100dvh;
-      display: grid;
-      place-items: center;
-      padding: 32px;
-      background:
-        radial-gradient(circle at 50% 14%, rgba(255,255,255,.95), transparent 36%),
-        var(--phone-stage-bg);
-      color: #191a1d;
-      font-family: Roboto, "Noto Sans", system-ui, sans-serif;
-    }
-
-    .phone-frame {
-      position: relative;
-      width: calc(var(--phone-screen-width) + var(--phone-bezel) * 2);
-      height: calc(var(--phone-screen-height) + var(--phone-bezel) * 2);
-      padding: var(--phone-bezel);
-      border-radius: var(--phone-outer-radius);
-      background:
-        linear-gradient(145deg, rgba(255,255,255,.2), transparent 18%),
-        linear-gradient(155deg, #414348 0%, #23252a 44%, #0c0d10 100%);
-      box-shadow:
-        inset 0 0 0 1px rgba(255,255,255,.13),
-        inset 0 0 0 2px rgba(0,0,0,.84),
-        0 34px 72px -22px rgba(8,10,14,.56),
-        0 11px 25px -10px rgba(8,10,14,.34);
-      isolation: isolate;
-    }
-
-    .phone-frame::before,
-    .phone-frame::after {
-      content: "";
-      position: absolute;
-      z-index: -1;
-      top: 92px;
-      bottom: 92px;
-      width: 2px;
-      background: linear-gradient(to bottom, transparent, rgba(255,255,255,.14) 18%, transparent 32%, transparent 72%, rgba(255,255,255,.07) 88%, transparent);
-    }
-    .phone-frame::before { left: 0; }
-    .phone-frame::after { right: 0; }
-
-    .hardware-button {
-      position: absolute;
-      right: -3px;
-      width: 4px;
-      border-radius: 3px;
-      background: linear-gradient(90deg, #08090b, #2d3036 62%, #08090b);
-      box-shadow: inset 0 1px rgba(255,255,255,.1);
-    }
-    .hardware-button.volume { top: 205px; height: 92px; }
-    .hardware-button.power { top: 322px; height: 70px; background: linear-gradient(90deg, #08090b, #3c424c 62%, #08090b); }
-
-    .phone-screen {
-      position: relative;
-      width: var(--phone-screen-width);
-      height: var(--phone-screen-height);
-      overflow: hidden;
-      border-radius: var(--phone-screen-radius);
-      background: var(--phone-screen-bg);
-      box-shadow: inset 0 0 0 1px rgba(255,255,255,.05);
-    }
-
-    .phone-content {
-      position: absolute;
-      inset: 0;
-      overflow-x: hidden;
-      overflow-y: auto;
-      overscroll-behavior: contain;
-      -webkit-overflow-scrolling: touch;
-      scrollbar-width: none;
-      padding-top: var(--phone-safe-top);
-      padding-bottom: var(--phone-safe-bottom);
-      background: var(--phone-screen-bg);
-    }
-    .phone-content::-webkit-scrollbar { display: none; }
-
-    .punch-hole {
-      position: absolute;
-      z-index: 20;
-      top: 14px;
-      left: 50%;
-      width: 14px;
-      height: 14px;
-      transform: translateX(-50%);
-      border-radius: 50%;
-      background: radial-gradient(circle at 38% 35%, #283343 0 10%, #090b0f 30%, #000 72%);
-      box-shadow: 0 0 0 1px rgba(255,255,255,.08), inset 0 0 3px #000;
-      pointer-events: none;
-    }
-
-    .status-bar {
-      position: absolute;
-      z-index: 15;
-      inset: 0 0 auto;
-      height: var(--phone-safe-top);
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) 64px minmax(0, 1fr);
-      align-items: start;
-      padding: 14px 19px 0;
-      color: var(--phone-system-fg);
-      pointer-events: none;
-    }
-    .status-time {
-      justify-self: start;
-      display: flex;
-      align-items: center;
-      height: 16px;
-      font-size: 14px;
-      font-weight: 600;
-      line-height: 1;
-      letter-spacing: .01em;
-    }
-    .status-cutout-zone { width: 64px; }
-    .status-icons {
-      justify-self: end;
-      display: inline-flex;
-      align-items: center;
-      height: 16px;
-      gap: 5px;
-    }
-    .status-icons svg { display: block; flex: none; fill: currentColor; }
-    .status-icons .wifi { width: 15px; height: 12px; }
-    .status-icons .cellular { width: 14px; height: 12px; }
-    .status-icons .battery { width: 9px; height: 14px; }
-
-    .gesture-indicator {
-      position: absolute;
-      z-index: 20;
-      left: 50%;
-      bottom: 8px;
-      width: 108px;
-      height: 4px;
-      transform: translateX(-50%);
-      border-radius: 99px;
-      background: var(--phone-system-fg);
-      opacity: .86;
-      pointer-events: none;
-    }
-
-    /* Presentation scaling: keep the whole handset visible on short viewports. */
-    @media (max-height: 998px) { .phone-frame { zoom: 0.9; } }
-    @media (max-height: 904px) { .phone-frame { zoom: 0.82; } }
-    @media (max-height: 829px) { .phone-frame { zoom: 0.74; } }
-    @media (max-height: 754px) { .phone-frame { zoom: 0.66; } }
-    /* Narrow viewports: the handset chrome collapses and the screen fills the
-       viewport, so the app behaves like a real phone page instead of
-       scrolling sideways. */
-    @media (max-width: 480px) {
-      body { padding: 0; display: block; }
-      .phone-frame { width: 100%; height: 100dvh; padding: 0; border-radius: 0; background: none; box-shadow: none; zoom: 1; }
-      .phone-frame::before, .phone-frame::after, .hardware-button { display: none; }
-      .phone-screen { width: 100%; height: 100%; border-radius: 0; }
-    }
-  </style>
-
   <!-- ============================ PRODUCT STYLES ============================ -->
   <style>
     /* OD-LAYOUT-PRIMITIVES v1 — structure only: display, flex/grid, overflow, wrapping, ratio.
@@ -536,6 +358,14 @@
   </style>
 
 <style id="ritual-native-shell">
+/* Real-device shell: system UI is supplied by Android/browser, never simulated in Ritual. */
+:root{--app-max-width:760px;--app-gutter:18px}
+html,body{overflow:hidden;overscroll-behavior:none}
+body{margin:0;min-height:100dvh;width:100%;background:var(--bg)}
+#app[data-app-shell]{min-height:100dvh;height:100dvh;width:100%}
+.app-main{padding-top:calc(env(safe-area-inset-top,0px) + 18px);padding-bottom:calc(env(safe-area-inset-bottom,0px) + 28px)}
+@media (min-width:760px){body{overflow:auto}#app[data-app-shell]{min-height:100vh;height:auto;max-width:var(--app-max-width);margin:0 auto}}
+@media (display-mode:standalone){body{background:var(--bg)}}
 :root{
  --bg:#090D0B;--surface:#101815;--surface2:#18231D;--line:#29352F;--fg:#F3EFE5;--muted:#8E9B93;
  --accent:#9AD9A9;--accent-ink:#08110B;--accent-soft:#173B28;--amber:#EAB66F;--amber-soft:#493621;
