@@ -1,0 +1,9 @@
+{
+  "appId": "com.ritual.habittracker",
+  "appName": "Ritual",
+  "webDir": "www",
+  "backgroundColor": "#090D0B",
+  "android": {
+    "backgroundColor": "#090D0B"
+  }
+}
