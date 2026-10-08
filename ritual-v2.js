@@ -94,7 +94,7 @@
     st.textContent = `
       .ritual-v2-profile{background:linear-gradient(145deg,var(--surface),var(--surface2));border:1px solid var(--line);border-radius:22px;padding:18px;margin-bottom:16px}
       .ritual-v2-head{display:flex;align-items:center;gap:13px}
-      .ritual-avatar{width:48px;height:48px;border-radius:16px;display:grid;place-items:center;background:var(--accent);color:var(--accent-ink);font:700 19px var(--font-d);object-fit:cover}
+      .ritual-avatar{width:48px;height:48px;border-radius:16px;display:grid;place-items:center;background:var(--accent);color:var(--accent-ink);font:700 19px var(--font-d);object-fit:cover;box-shadow:0 8px 20px rgba(0,0,0,.16)}
       .ritual-avatar.large{width:76px;height:76px;border-radius:22px;font-size:28px}
       .ritual-v2-name{font:700 21px/1.1 var(--font-d)}
       .ritual-v2-bio{color:var(--muted);font-size:12.5px;margin-top:4px}
@@ -261,7 +261,7 @@
     renderingEnhancement = true;
     injectStyles();
     var view=document.getElementById('view'), tab=document.querySelector('#tabbar button[data-tab="you"][aria-selected="true"]');
-    if(!view||!tab)return;
+    if(!view||!tab){ renderingEnhancement = false; return; }
     var old=view.querySelector('.ritual-v2-profile');if(old)old.remove();
     view.insertAdjacentHTML('afterbegin',profileCard());
     var card=view.querySelector('.ritual-v2-profile');if(!card)return;
