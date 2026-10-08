@@ -1,5 +1,6 @@
-/* Ritual v2 enhancement layer — local profile, share cards, notification controls.
-   Zero backend, zero paid services. Safe to remove later when native auth/cloud exists. */
+/* Ritual v3 stability layer — local profile, share cards, notification controls.
+   Zero backend, zero paid services. Designed to be safe on Android, PWA, and offline web.
+   Important: enhancement rendering is idempotent so its MutationObserver can never self-trigger forever. */
 (function () {
   'use strict';
 
@@ -7,45 +8,57 @@
   var REMINDER_KEY = 'ritual.reminders.v2';
   var lastReminderMinute = '';
 
+  function safeCryptoId(prefix) {
+    try {
+      if (globalThis.crypto && typeof globalThis.crypto.randomUUID === 'function') {
+        return globalThis.crypto.randomUUID();
+      }
+    } catch (e) {}
+    return prefix + '-' + Date.now() + '-' + Math.random().toString(36).slice(2);
+  }
+
   function getState() {
     try { return JSON.parse(localStorage.getItem('ritual.v1') || 'null') || {}; }
     catch (e) { return {}; }
   }
+
   function saveStatePatch(patch) {
     var s = getState();
     Object.keys(patch).forEach(function (k) { s[k] = patch[k]; });
     localStorage.setItem('ritual.v1', JSON.stringify(s));
   }
+
   function getProfile() {
     try {
       var p = JSON.parse(localStorage.getItem(PROFILE_KEY) || 'null');
       if (p) return p;
     } catch (e) {}
-    return { id: (crypto && crypto.randomUUID) ? crypto.randomUUID() : 'p-' + Date.now(), name: '', bio: '', avatar: '', createdAt: new Date().toISOString() };
+    return { id: safeCryptoId('p'), name: '', bio: '', avatar: '', createdAt: new Date().toISOString() };
   }
+
   function setProfile(p) {
     localStorage.setItem(PROFILE_KEY, JSON.stringify(p));
-    /* Also mirror into the existing Ritual backup object so normal Export/Import carries it. */
     saveStatePatch({ profile: p });
   }
+
   function escapeHtml(s) {
     return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) {
       return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c];
     });
   }
-  function uid() {
-    return (crypto && crypto.randomUUID) ? crypto.randomUUID() : 'id-' + Date.now() + '-' + Math.random().toString(36).slice(2);
-  }
+
   function dateKey(d) {
     var x = d || new Date();
     var y = x.getFullYear(), m = String(x.getMonth() + 1).padStart(2, '0'), day = String(x.getDate()).padStart(2, '0');
     return y + '-' + m + '-' + day;
   }
+
   function shiftDate(key, delta) {
     var p = key.split('-').map(Number), d = new Date(p[0], p[1] - 1, p[2]);
     d.setDate(d.getDate() + delta);
     return dateKey(d);
   }
+
   function stats() {
     var s = getState(), logs = s.log || {}, habits = Array.isArray(s.habits) ? s.habits : [];
     var total = 0, days = {};
@@ -55,18 +68,21 @@
         if (row[id]) { total++; days[day] = true; }
       });
     });
+
     var today = dateKey(), cur = 0, k = today;
     while (days[k]) { cur++; k = shiftDate(k, -1); }
+
     var best = 0, run = 0, last = null;
     Object.keys(days).sort().forEach(function (d) {
       if (last && shiftDate(last, 1) === d) run++; else run = 1;
       if (run > best) best = run;
       last = d;
     });
+
     var scheduled = 0, completed30 = 0;
+    var active = habits.filter(function (h) { return h && !h.archived; });
     for (var i = 0; i < 30; i++) {
       var dk = shiftDate(today, -i), row30 = logs[dk] || {};
-      var active = habits.filter(function (h) { return h && !h.archived; });
       active.forEach(function (h) {
         var dow = new Date(dk + 'T12:00:00').getDay();
         var daysArr = Array.isArray(h.days) ? h.days : [0,1,2,3,4,5,6];
@@ -76,7 +92,13 @@
         }
       });
     }
-    return { total: total, current: cur, best: best, consistency: scheduled ? Math.round(completed30 / scheduled * 100) : 0, habits: habits.filter(function(h){return h && !h.archived;}).length };
+    return {
+      total: total,
+      current: cur,
+      best: best,
+      consistency: scheduled ? Math.round(completed30 / scheduled * 100) : 0,
+      habits: active.length
+    };
   }
 
   function avatarMarkup(p, size) {
@@ -105,7 +127,6 @@
       .ritual-v2-stat b{display:block;font:700 19px var(--font-d)}
       .ritual-v2-stat span{font-size:9.5px;color:var(--muted)}
       .ritual-v2-perm{margin-top:12px;padding:12px;border-radius:14px;background:var(--bg);border:1px solid var(--line);font-size:12px}
-      .ritual-v2-row{display:flex;align-items:center;justify-content:space-between;gap:10px}
       .ritual-v2-modal{position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.62);display:grid;place-items:center;padding:18px}
       .ritual-v2-modal[hidden]{display:none}
       .ritual-v2-dialog{width:min(100%,390px);max-height:90dvh;overflow:auto;background:var(--surface);color:var(--fg);border:1px solid var(--line);border-radius:24px;padding:20px}
@@ -123,7 +144,8 @@
   function toast(msg) {
     var old = document.querySelector('.ritual-v2-toast'); if (old) old.remove();
     var el = document.createElement('div'); el.className = 'ritual-v2-toast'; el.textContent = msg;
-    document.body.appendChild(el); setTimeout(function(){el.remove();}, 2200);
+    document.body.appendChild(el);
+    setTimeout(function(){el.remove();}, 2200);
   }
 
   function openModal(html) {
@@ -133,6 +155,13 @@
     document.body.appendChild(wrap);
     wrap.addEventListener('click',function(e){if(e.target===wrap)wrap.remove();});
     return wrap;
+  }
+
+  function refreshEnhancementCard() {
+    var view = document.getElementById('view');
+    var existing = view && view.querySelector('.ritual-v2-profile');
+    if (existing) existing.remove();
+    renderEnhancement();
   }
 
   function editProfile() {
@@ -152,7 +181,11 @@
       p.bio=modal.querySelector('#rv-bio').value.trim();
       p.avatar=modal.querySelector('#rv-avatar').value.trim();
       if(!p.name){toast('Add a display name');return;}
-      p.updatedAt=new Date().toISOString(); setProfile(p); modal.remove(); renderEnhancement(); toast('Profile saved');
+      p.updatedAt=new Date().toISOString();
+      setProfile(p);
+      modal.remove();
+      refreshEnhancementCard();
+      toast('Profile saved');
     };
   }
 
@@ -163,8 +196,8 @@
         try { new Notification('Ritual reminders enabled', {body:'Ritual can now remind you while the app is open.'}); } catch(e){}
         toast('Notifications enabled');
       } else toast('Notification permission was not granted');
-      renderEnhancement();
-    });
+      refreshEnhancementCard();
+    }).catch(function(){ toast('Notification permission request failed'); });
   }
 
   function reminderSettings() {
@@ -173,20 +206,20 @@
     var perm=('Notification' in window)?Notification.permission:'unsupported';
     var modal=openModal(
       '<h2>Reminders</h2>'+
-      '<p class="small muted" style="margin-bottom:14px">Ritual uses your browser&#39;s free notification system. No notification service or subscription is used.</p>'+
+      '<p class="small muted" style="margin-bottom:14px">Ritual uses the platform notification system. No account, server, or paid notification service is required.</p>'+
       '<div class="ritual-v2-field"><label for="rv-time">Daily reminder time</label><input id="rv-time" type="time" value="'+escapeHtml(r.time)+'"></div>'+
       '<label style="display:flex;gap:9px;align-items:center;margin:10px 0;font-size:13px"><input id="rv-enabled" type="checkbox" '+(r.enabled?'checked':'')+'> Enable daily reminder</label>'+
       '<div class="ritual-v2-perm"><b>Permission:</b> '+escapeHtml(perm)+
       (perm!=='granted'?'<br><button class="btn subtle" data-rv-perm style="margin-top:9px">Allow notifications</button>':'')+
       '</div>'+
-      '<p class="small muted" style="margin-top:12px">Because this version has no server or native scheduler, background delivery is browser/platform dependent. When Ritual is open, it can check the reminder time reliably.</p>'+
+      '<p class="small muted" style="margin-top:12px">Background delivery depends on the platform. While Ritual is open, the local reminder check is reliable.</p>'+
       '<div class="ritual-v2-dialog-actions"><button class="btn ghost" data-rv-close>Cancel</button><button class="btn" data-rv-save>Save</button></div>'
     );
     var permBtn=modal.querySelector('[data-rv-perm]'); if(permBtn) permBtn.onclick=requestNotifications;
     modal.querySelector('[data-rv-close]').onclick=function(){modal.remove();};
     modal.querySelector('[data-rv-save]').onclick=function(){
       r.time=modal.querySelector('#rv-time').value||'20:00'; r.enabled=modal.querySelector('#rv-enabled').checked;
-      localStorage.setItem(REMINDER_KEY,JSON.stringify(r)); modal.remove(); renderEnhancement(); toast('Reminder settings saved');
+      localStorage.setItem(REMINDER_KEY,JSON.stringify(r)); modal.remove(); toast('Reminder settings saved');
     };
   }
 
@@ -206,6 +239,7 @@
     var p=getProfile(), st=stats(), title=currentAchievement(st);
     var canvas=document.createElement('canvas'), W=1080,H=1350; canvas.width=W;canvas.height=H;
     var c=canvas.getContext('2d');
+    if (!c) { toast('Achievement card is not supported on this device'); return; }
     c.fillStyle='#0B0E13';c.fillRect(0,0,W,H);
     c.fillStyle='#3DDC97';c.fillRect(72,86,90,8);
     c.fillStyle='#EEF2F7';c.font='600 42px Arial';c.fillText('RITUAL',72,160);
@@ -218,15 +252,18 @@
     c.fillText(dateKey(new Date()),72,1220);
     c.fillStyle='#3DDC97';c.font='500 26px Arial';c.fillText('Small habits. Kept daily.',72,1275);
     canvas.toBlob(function(blob){
+      if (!blob) { toast('Could not create achievement card'); return; }
       var file=new File([blob],'ritual-achievement-'+dateKey(new Date())+'.png',{type:'image/png'});
       if(navigator.share && navigator.canShare && navigator.canShare({files:[file]})){
         navigator.share({title:'Ritual achievement',text:title,files:[file]}).catch(function(){});
       } else {
-        var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=file.name;document.body.appendChild(a);a.click();a.remove();
-        setTimeout(function(){URL.revokeObjectURL(a.href);},1500);toast('Achievement card downloaded');
+        var url=URL.createObjectURL(blob);
+        var a=document.createElement('a');a.href=url;a.download=file.name;document.body.appendChild(a);a.click();a.remove();
+        setTimeout(function(){URL.revokeObjectURL(url);},1500);toast('Achievement card downloaded');
       }
     },'image/png');
   }
+
   function wrapCanvas(c,text,x,y,maxWidth,lineHeight){
     var words=text.split(' '),line='';
     for(var n=0;n<words.length;n++){var test=line?line+' '+words[n]:words[n];if(c.measureText(test).width>maxWidth&&line){c.fillText(line,x,y);line=words[n];y+=lineHeight;}else line=test;}
@@ -255,34 +292,53 @@
       '</section>';
   }
 
-  var renderingEnhancement = false;
+  /*
+   * CRITICAL STABILITY RULE:
+   * The app's main renderer owns #view. This enhancement layer may observe it,
+   * but it must be idempotent. It only inserts the profile card when absent.
+   * It never removes/reinserts the card merely because the observer fired.
+   * Therefore its own DOM mutation cannot create an infinite MutationObserver loop.
+   */
   function renderEnhancement(){
-    if (renderingEnhancement) return;
-    renderingEnhancement = true;
     injectStyles();
-    var view=document.getElementById('view'), tab=document.querySelector('#tabbar button[data-tab="you"][aria-selected="true"]');
-    if(!view||!tab){ renderingEnhancement = false; return; }
-    var old=view.querySelector('.ritual-v2-profile');if(old)old.remove();
+    var view=document.getElementById('view');
+    var tab=document.querySelector('#tabbar button[data-tab="you"][aria-selected="true"]');
+    if(!view||!tab) return;
+
+    if (view.querySelector('.ritual-v2-profile')) return;
+
     view.insertAdjacentHTML('afterbegin',profileCard());
-    var card=view.querySelector('.ritual-v2-profile');if(!card)return;
-    card.querySelector('[data-rv-edit]').onclick=editProfile;
-    card.querySelector('[data-rv-share]').onclick=shareAchievement;
-    card.querySelector('[data-rv-reminders]').onclick=reminderSettings;
-    card.querySelector('[data-rv-backup]').onclick=function(){
+    var card=view.querySelector('.ritual-v2-profile');
+    if(!card) return;
+
+    var edit=card.querySelector('[data-rv-edit]');
+    var share=card.querySelector('[data-rv-share]');
+    var reminders=card.querySelector('[data-rv-reminders]');
+    var backup=card.querySelector('[data-rv-backup]');
+    if(edit) edit.onclick=editProfile;
+    if(share) share.onclick=shareAchievement;
+    if(reminders) reminders.onclick=reminderSettings;
+    if(backup) backup.onclick=function(){
       var s=getState(), p=getProfile();
       var payload=Object.assign({},s,{profile:p,profileBackupVersion:2});
       var blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
-      var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='ritual-profile-backup-'+dateKey(new Date())+'.json';document.body.appendChild(a);a.click();a.remove();
-      setTimeout(function(){URL.revokeObjectURL(a.href);},1500);toast('Backup downloaded');
+      var url=URL.createObjectURL(blob);
+      var a=document.createElement('a');a.href=url;a.download='ritual-profile-backup-'+dateKey(new Date())+'.json';document.body.appendChild(a);a.click();a.remove();
+      setTimeout(function(){URL.revokeObjectURL(url);},1500);toast('Backup downloaded');
     };
-    renderingEnhancement = false;
   }
 
-  /* Attach to the existing app without replacing its renderer. */
-  var observer=new MutationObserver(function(){renderEnhancement();});
+  var observer=new MutationObserver(function(){
+    var view=document.getElementById('view');
+    if (!view) return;
+    var tab=document.querySelector('#tabbar button[data-tab="you"][aria-selected="true"]');
+    if (tab && !view.querySelector('.ritual-v2-profile')) renderEnhancement();
+  });
+
   function boot(){
     injectStyles();
-    var v=document.getElementById('view');if(v)observer.observe(v,{childList:true,subtree:true});
+    var v=document.getElementById('view');
+    if(v) observer.observe(v,{childList:true});
     setTimeout(renderEnhancement,80);
     setInterval(checkReminder,15000);
     document.addEventListener('click',function(e){
@@ -290,5 +346,6 @@
       if(b)setTimeout(renderEnhancement,50);
     });
   }
+
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
 })();
