@@ -389,8 +389,10 @@
     habits.forEach(function(h){counts[h.id]={h:h,c:0};});
     Object.keys(logs).forEach(function(dk){var row=logs[dk]||{};Object.keys(row).forEach(function(id){if(row[id]&&counts[id])counts[id].c++;});});
     var top=Object.keys(counts).map(function(id){return counts[id];}).sort(function(a,b){return b.c-a.c;})[0];
-    var st=stats(), daysTracked=Object.keys(logs).length;
-    return {ch:ch,st:st,daysTracked:daysTracked,top:top?top.h.title:'Showing up',topCount:top?top.c:0,habits:habits.length};
+    var year=String(new Date().getFullYear()), yearLogs=Object.keys(logs).filter(function(dk){return dk.slice(0,4)===year;});
+    var yearCompletions=0; yearLogs.forEach(function(dk){var row=logs[dk]||{};Object.keys(row).forEach(function(id){if(row[id])yearCompletions++;});});
+    var st=stats();
+    return {ch:ch,st:st,year:year,daysTracked:yearLogs.length,yearCompletions:yearCompletions,top:top?top.h.title:'Showing up',topCount:top?top.c:0,habits:habits.length};
   }
 
   function shareRecap(){
@@ -400,11 +402,11 @@
     var grd=c.createRadialGradient(850,180,10,850,180,620);grd.addColorStop(0,'rgba(183,243,107,.18)');grd.addColorStop(1,'rgba(183,243,107,0)');c.fillStyle=grd;c.fillRect(0,0,W,H);
     c.fillStyle='#B7F36B';c.fillRect(80,100,100,9);
     c.fillStyle='#F4F5F1';c.font='800 54px Arial';c.fillText('RITUAL',80,190);
-    c.fillStyle='#8F9A92';c.font='700 25px Arial';c.fillText('MY YEAR IN RITUAL',80,260);
+    c.fillStyle='#8F9A92';c.font='700 25px Arial';c.fillText('RITUAL '+r.year,80,260);
     c.fillStyle='#F4F5F1';c.font='800 86px Arial';wrapCanvas(c,(p.name||'Your').toUpperCase(),80,410,900,100);
     c.fillStyle='#B7F36B';c.font='800 104px Arial';c.fillText(String(r.st.current),80,650);
     c.fillStyle='#F4F5F1';c.font='700 38px Arial';c.fillText('DAY STREAK',80,710);
-    c.fillStyle='#9BA69F';c.font='600 28px Arial';c.fillText(String(r.st.total)+' total check-ins  ·  '+String(r.st.best)+' best streak',80,770);
+    c.fillStyle='#9BA69F';c.font='600 28px Arial';c.fillText(String(r.yearCompletions)+' check-ins this year  ·  '+String(r.st.best)+' best streak',80,770);
     c.fillStyle='#18211C';roundRect(c,80,860,920,380,34);c.fill();
     c.fillStyle='#F4F5F1';c.font='800 48px Arial';c.fillText('YOUR ARC',125,945);
     c.fillStyle='#B7F36B';c.font='800 72px Arial';c.fillText(String(r.ch.elapsed)+' / '+String(r.ch.target),125,1050);
@@ -415,7 +417,7 @@
     c.fillStyle='#B7F36B';c.font='700 32px Arial';wrapCanvas(c,r.top,125,1225,760,44);
     c.fillStyle='#9BA69F';c.font='600 24px Arial';c.fillText(String(r.topCount)+' check-ins',125,1310);
     c.fillStyle='#F4F5F1';c.font='800 48px Arial';c.fillText('THE RECEIPT',80,1460);
-    c.fillStyle='#9BA69F';c.font='600 28px Arial';c.fillText(String(r.daysTracked)+' days with activity',80,1520);
+    c.fillStyle='#9BA69F';c.font='600 28px Arial';c.fillText(String(r.daysTracked)+' active days this year',80,1520);
     c.fillText(String(r.habits)+' active habits',80,1570);
     c.fillText('Local. Private. Yours.',80,1620);
     c.fillStyle='#B7F36B';c.font='800 34px Arial';c.fillText('Small habits. Kept daily.',80,1770);
