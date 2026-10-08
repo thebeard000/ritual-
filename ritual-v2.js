@@ -127,6 +127,34 @@
       .ritual-v2-stat b{display:block;font:700 19px var(--font-d)}
       .ritual-v2-stat span{font-size:9.5px;color:var(--muted)}
       .ritual-v2-perm{margin-top:12px;padding:12px;border-radius:14px;background:var(--bg);border:1px solid var(--line);font-size:12px}
+      .ritual-challenge{position:relative;overflow:hidden;margin:0 0 16px;padding:18px;border:1px solid var(--line);border-radius:24px;background:linear-gradient(135deg,var(--surface),var(--surface2));box-shadow:0 16px 42px rgba(0,0,0,.16)}
+      .ritual-challenge:before{content:"";position:absolute;width:190px;height:190px;right:-82px;top:-76px;border-radius:50%;border:1px solid color-mix(in srgb,var(--accent) 22%,transparent);box-shadow:0 0 0 22px color-mix(in srgb,var(--accent) 5%,transparent),0 0 0 48px color-mix(in srgb,var(--accent) 3%,transparent)}
+      .ritual-challenge-top{position:relative;z-index:2;display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+      .ritual-challenge-kicker{font:700 10px/1 var(--font-m);letter-spacing:.15em;color:var(--accent);text-transform:uppercase}
+      .ritual-challenge-title{font:800 25px/.98 var(--font-d);letter-spacing:-.035em;margin-top:7px}
+      .ritual-challenge-sub{font-size:12px;color:var(--muted);line-height:1.4;margin-top:7px;max-width:270px}
+      .ritual-challenge-badge{padding:7px 9px;border-radius:10px;background:var(--accent);color:var(--accent-ink);font:800 9px var(--font-m);white-space:nowrap}
+      .ritual-challenge-grid{position:relative;z-index:2;display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;margin-top:15px}
+      .ritual-challenge-stat{background:color-mix(in srgb,var(--bg) 68%,transparent);border:1px solid color-mix(in srgb,var(--line) 80%,transparent);border-radius:13px;padding:10px 7px}
+      .ritual-challenge-stat b{display:block;font:800 19px var(--font-d)}
+      .ritual-challenge-stat span{display:block;margin-top:3px;color:var(--muted);font-size:9.5px}
+      .ritual-challenge-track{position:relative;z-index:2;height:8px;border-radius:99px;background:color-mix(in srgb,var(--fg) 9%,transparent);overflow:hidden;margin-top:13px}
+      .ritual-challenge-track span{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,var(--accent),#E9FFB6)}
+      .ritual-challenge-foot{position:relative;z-index:2;display:flex;justify-content:space-between;gap:8px;align-items:center;margin-top:9px}
+      .ritual-challenge-foot span{font:700 10px var(--font-m);color:var(--muted)}
+      .ritual-challenge-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:13px;position:relative;z-index:2}
+      .ritual-challenge-actions button{min-height:42px}
+      .ritual-recap{position:relative;overflow:hidden;margin-top:14px;padding:18px;border-radius:22px;background:#101612;color:#F4F5F1;border:1px solid #2A352E}
+      .ritual-recap:after{content:"";position:absolute;width:170px;height:170px;right:-70px;top:-85px;border-radius:50%;border:1px solid rgba(183,243,107,.18);box-shadow:0 0 0 24px rgba(183,243,107,.04),0 0 0 48px rgba(183,243,107,.025)}
+      .ritual-recap-title{font:800 23px/1 var(--font-d);letter-spacing:-.03em;position:relative;z-index:2}
+      .ritual-recap-sub{font-size:12px;color:#9BA69F;line-height:1.45;margin-top:6px;position:relative;z-index:2}
+      .ritual-recap-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:14px;position:relative;z-index:2}
+      .ritual-recap-stat{padding:11px;border-radius:14px;background:#18211C}
+      .ritual-recap-stat b{display:block;font:800 21px var(--font-d)}
+      .ritual-recap-stat span{font-size:9.5px;color:#8D9991}
+      .ritual-recap-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px;position:relative;z-index:2}
+      .ritual-recap-actions button{min-height:42px}
+      @media(max-width:420px){.ritual-challenge-grid{grid-template-columns:repeat(3,1fr)}.ritual-challenge-stat b{font-size:17px}}
       .ritual-hero{position:relative;display:grid;grid-template-columns:minmax(0,1fr) 132px;gap:8px;align-items:stretch;overflow:hidden;margin-bottom:16px;padding:20px;border:1px solid var(--line);border-radius:24px;background:radial-gradient(circle at 82% 24%,rgba(183,243,107,.16),transparent 32%),linear-gradient(145deg,#111713,#0D120F 68%,#182319);box-shadow:0 14px 38px rgba(0,0,0,.18)}
       .ritual-hero:after{content:"";position:absolute;inset:auto -35px -55px auto;width:170px;height:170px;border-radius:50%;border:1px solid rgba(183,243,107,.16);box-shadow:0 0 0 24px rgba(183,243,107,.035),0 0 0 48px rgba(183,243,107,.02);pointer-events:none}
       .ritual-hero-copy{position:relative;z-index:2;min-width:0;display:flex;flex-direction:column;justify-content:center}
@@ -293,6 +321,113 @@
     }
   }
 
+  var CHALLENGE_KEY = 'ritual.challenge.v1';
+
+  function getChallenge(){
+    var d={mode:'66',startedAt:null,completed:false,maintenance:false};
+    try{d=Object.assign(d,JSON.parse(localStorage.getItem(CHALLENGE_KEY)||'{}'));}catch(e){}
+    if(!d.startedAt) d.startedAt=(getState().start||dateKey(new Date()));
+    return d;
+  }
+
+  function setChallenge(d){localStorage.setItem(CHALLENGE_KEY,JSON.stringify(d));}
+
+  function challengeDays(mode){return mode==='30'?30:mode==='90'?90:66;}
+
+  function challengeData(){
+    var d=getChallenge(), target=challengeDays(d.mode), st=stats(), s=getState(), logs=s.log||{}, habits=Array.isArray(s.habits)?s.habits.filter(function(h){return h&&!h.archived;}):[];
+    var start=d.startedAt||s.start||dateKey(new Date()), today=dateKey(new Date());
+    var elapsed=Math.max(1,Math.min(target,daysBetween(start,today)+1)), kept=0, activeDays=0;
+    for(var i=0;i<elapsed;i++){
+      var dk=shiftDate(start,i), row=logs[dk]||{}, scheduled=habits.filter(function(h){
+        var ds=Array.isArray(h.days)?h.days:[0,1,2,3,4,5,6];
+        return ds.indexOf(new Date(dk+'T12:00:00').getDay())>=0;
+      });
+      if(!scheduled.length) continue;
+      activeDays++;
+      var done=scheduled.filter(function(h){return !!row[h.id];}).length;
+      if(done/scheduled.length>=.6) kept++;
+    }
+    var pct=Math.round(elapsed/target*100), consistency=activeDays?Math.round(kept/activeDays*100):0;
+    var complete=elapsed>=target&&consistency>=60;
+    if(complete&&!d.completed){d.completed=true;d.maintenance=true;setChallenge(d);}
+    return {d:d,target:target,elapsed:elapsed,left:Math.max(0,target-elapsed),pct:Math.min(100,pct),kept:kept,activeDays:activeDays,consistency:consistency,complete:complete,streak:st.current,total:st.total};
+  }
+
+  function challengeCard(){
+    var x=challengeData(), title=x.complete?'Maintenance mode':'The '+x.target+' Day Arc';
+    var sub=x.complete?'You finished the challenge. Keep the system alive with weekly consistency.':x.left===0?'Final check. Finish today strong.':x.left===1?'One day left. Close the arc.':x.left+' days left. Show up, not perfect.';
+    var phase=x.complete?'MAINTAIN':('DAY '+x.elapsed+' / '+x.target);
+    return '<section class="ritual-challenge" aria-label="Ritual challenge">'+
+      '<div class="ritual-challenge-top"><div><div class="ritual-challenge-kicker">'+(x.complete?'Long game':'Active challenge')+'</div><div class="ritual-challenge-title">'+title+'</div><div class="ritual-challenge-sub">'+escapeHtml(sub)+'</div></div><span class="ritual-challenge-badge">'+phase+'</span></div>'+
+      '<div class="ritual-challenge-grid"><div class="ritual-challenge-stat"><b>'+x.kept+'</b><span>kept days</span></div><div class="ritual-challenge-stat"><b>'+x.consistency+'%</b><span>consistency</span></div><div class="ritual-challenge-stat"><b>'+x.streak+'</b><span>streak</span></div></div>'+
+      '<div class="ritual-challenge-track"><span style="width:'+x.pct+'%"></span></div><div class="ritual-challenge-foot"><span>'+x.pct+'% complete</span><span>'+x.target+' day arc</span></div>'+
+      '<div class="ritual-challenge-actions"><button class="btn subtle" data-rv-challenge>Change arc</button><button class="btn" data-rv-recap>Share recap</button></div>'+
+      '</section>';
+  }
+
+  function challengePicker(){
+    var x=challengeData(), d=x.d;
+    var modal=openModal(
+      '<h2>Choose your arc</h2>'+
+      '<p class="small muted">Pick the season you can actually finish. Your habits stay the same.</p>'+
+      '<div style="display:grid;gap:8px;margin-top:14px">'+
+      [['30','30 Days','Build the chain'],['66','66 Days','Become consistent'],['90','90 Days','Make it maintenance']].map(function(o){
+        return '<button class="btn '+(d.mode===o[0]?'':'ghost')+'" data-rv-mode="'+o[0]+'" style="justify-content:space-between"><span>'+o[1]+'</span><span style="opacity:.7;font-size:11px">'+o[2]+'</span></button>';
+      }).join('')+'</div>'+
+      '<p class="small muted" style="margin-top:13px">Changing the arc does not delete your history.</p>'+
+      '<div class="ritual-v2-dialog-actions"><button class="btn ghost" data-rv-close>Cancel</button><button class="btn" data-rv-close>Done</button></div>'
+    );
+    modal.querySelectorAll('[data-rv-mode]').forEach(function(b){b.onclick=function(){
+      d.mode=b.getAttribute('data-rv-mode');d.startedAt=dateKey(new Date());d.completed=false;d.maintenance=false;setChallenge(d);modal.remove();toast('New arc started');refreshEnhancementCard();
+    };});
+    modal.querySelectorAll('[data-rv-close]').forEach(function(b){b.onclick=function(){modal.remove();};});
+  }
+
+  function recapData(){
+    var s=getState(), ch=challengeData(), habits=Array.isArray(s.habits)?s.habits.filter(function(h){return h&&!h.archived;}):[], logs=s.log||{}, counts={};
+    habits.forEach(function(h){counts[h.id]={h:h,c:0};});
+    Object.keys(logs).forEach(function(dk){var row=logs[dk]||{};Object.keys(row).forEach(function(id){if(row[id]&&counts[id])counts[id].c++;});});
+    var top=Object.keys(counts).map(function(id){return counts[id];}).sort(function(a,b){return b.c-a.c;})[0];
+    var st=stats(), daysTracked=Object.keys(logs).length;
+    return {ch:ch,st:st,daysTracked:daysTracked,top:top?top.h.title:'Showing up',topCount:top?top.c:0,habits:habits.length};
+  }
+
+  function shareRecap(){
+    var p=getProfile(), r=recapData(), W=1080,H=1920, canvas=document.createElement('canvas');
+    canvas.width=W;canvas.height=H;var c=canvas.getContext('2d');if(!c){toast('Recap is not supported here');return;}
+    c.fillStyle='#090D0B';c.fillRect(0,0,W,H);
+    var grd=c.createRadialGradient(850,180,10,850,180,620);grd.addColorStop(0,'rgba(183,243,107,.18)');grd.addColorStop(1,'rgba(183,243,107,0)');c.fillStyle=grd;c.fillRect(0,0,W,H);
+    c.fillStyle='#B7F36B';c.fillRect(80,100,100,9);
+    c.fillStyle='#F4F5F1';c.font='800 54px Arial';c.fillText('RITUAL',80,190);
+    c.fillStyle='#8F9A92';c.font='700 25px Arial';c.fillText('MY YEAR IN RITUAL',80,260);
+    c.fillStyle='#F4F5F1';c.font='800 86px Arial';wrapCanvas(c,(p.name||'Your').toUpperCase(),80,410,900,100);
+    c.fillStyle='#B7F36B';c.font='800 104px Arial';c.fillText(String(r.st.current),80,650);
+    c.fillStyle='#F4F5F1';c.font='700 38px Arial';c.fillText('DAY STREAK',80,710);
+    c.fillStyle='#9BA69F';c.font='600 28px Arial';c.fillText(String(r.st.total)+' total check-ins  ·  '+String(r.st.best)+' best streak',80,770);
+    c.fillStyle='#18211C';roundRect(c,80,860,920,380,34);c.fill();
+    c.fillStyle='#F4F5F1';c.font='800 48px Arial';c.fillText('YOUR ARC',125,945);
+    c.fillStyle='#B7F36B';c.font='800 72px Arial';c.fillText(String(r.ch.elapsed)+' / '+String(r.ch.target),125,1050);
+    c.fillStyle='#9BA69F';c.font='600 25px Arial';c.fillText('days travelled',125,1090);
+    c.fillStyle='#F4F5F1';c.font='700 38px Arial';c.fillText(String(r.ch.consistency)+'% consistency',520,1050);
+    c.fillStyle='#9BA69F';c.font='600 25px Arial';c.fillText(String(r.ch.kept)+' kept days',520,1090);
+    c.fillStyle='#F4F5F1';c.font='800 44px Arial';c.fillText('Most kept',125,1165);
+    c.fillStyle='#B7F36B';c.font='700 32px Arial';wrapCanvas(c,r.top,125,1225,760,44);
+    c.fillStyle='#9BA69F';c.font='600 24px Arial';c.fillText(String(r.topCount)+' check-ins',125,1310);
+    c.fillStyle='#F4F5F1';c.font='800 48px Arial';c.fillText('THE RECEIPT',80,1460);
+    c.fillStyle='#9BA69F';c.font='600 28px Arial';c.fillText(String(r.daysTracked)+' days with activity',80,1520);
+    c.fillText(String(r.habits)+' active habits',80,1570);
+    c.fillText('Local. Private. Yours.',80,1620);
+    c.fillStyle='#B7F36B';c.font='800 34px Arial';c.fillText('Small habits. Kept daily.',80,1770);
+    c.fillStyle='#8F9A92';c.font='600 22px Arial';c.fillText('ritual · your progress, without the performance',80,1830);
+    canvas.toBlob(function(blob){if(!blob){toast('Could not create recap');return;}var file=new File([blob],'ritual-recap-'+dateKey(new Date())+'.png',{type:'image/png'});
+      if(navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){navigator.share({title:'My Ritual recap',text:'My Ritual progress',files:[file]}).catch(function(){});}
+      else{var url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=file.name;document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(url);},1500);toast('Recap saved');}
+    },'image/png');
+  }
+
+  function roundRect(c,x,y,w,h,r){c.beginPath();c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+h,r);c.arcTo(x+w,y+h,x,y+h,r);c.arcTo(x,y+h,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath();}
+  
   function heroData(){
     var s=getState(), logs=s.log||{}, habits=Array.isArray(s.habits)?s.habits:[], today=dateKey();
     var totalXp=0, totalCompletions=0;
@@ -360,6 +495,9 @@
       '<div class="ritual-v2-stats"><div class="ritual-v2-stat"><b>'+st.current+'</b><span>current streak</span></div><div class="ritual-v2-stat"><b>'+st.total+'</b><span>check-ins</span></div><div class="ritual-v2-stat"><b>'+st.consistency+'%</b><span>30-day score</span></div></div>'+
       '<div class="ritual-v2-actions"><button class="btn subtle" data-rv-edit>Profile</button><button class="btn" data-rv-share>Share achievement</button></div>'+
       '<div class="ritual-v2-actions"><button class="btn ghost" data-rv-reminders>Reminders</button><button class="btn ghost" data-rv-backup>Backup profile</button></div>'+
+      '<section class="ritual-recap"><div class="ritual-recap-title">Your Ritual recap</div><div class="ritual-recap-sub">A shareable receipt of the work you have actually done.</div>'+
+      '<div class="ritual-recap-grid"><div class="ritual-recap-stat"><b>'+stats().total+'</b><span>check-ins</span></div><div class="ritual-recap-stat"><b>'+stats().best+'</b><span>best streak</span></div></div>'+
+      '<div class="ritual-recap-actions"><button class="btn subtle" data-rv-recap-profile>Share recap</button><button class="btn ghost" data-rv-challenge-profile>Challenge</button></div></section>'+
       '</section>';
   }
 
@@ -385,6 +523,10 @@
         var share=card.querySelector('[data-rv-share]');
         var reminders=card.querySelector('[data-rv-reminders]');
         var backup=card.querySelector('[data-rv-backup]');
+        var recapP=card.querySelector('[data-rv-recap-profile]');
+        var challengeP=card.querySelector('[data-rv-challenge-profile]');
+        if(recapP) recapP.onclick=shareRecap;
+        if(challengeP) challengeP.onclick=challengePicker;
         if(edit) edit.onclick=editProfile;
         if(share) share.onclick=shareAchievement;
         if(reminders) reminders.onclick=reminderSettings;
@@ -399,8 +541,14 @@
       }
     }
 
-    if (todayTab && !view.querySelector('.ritual-hero')) {
-      view.insertAdjacentHTML('afterbegin',heroCard());
+    if (todayTab && !view.querySelector('.ritual-challenge')) {
+      view.insertAdjacentHTML('afterbegin',challengeCard());
+      var cc=view.querySelector('.ritual-challenge');
+      if(cc){
+        var cb=cc.querySelector('[data-rv-challenge]'), cr=cc.querySelector('[data-rv-recap]');
+        if(cb) cb.onclick=challengePicker;
+        if(cr) cr.onclick=shareRecap;
+      }
     }
   }
 
@@ -409,7 +557,7 @@
     if (!view) return;
     var youTab=document.querySelector('#tabbar button[data-tab="you"][aria-selected="true"]');
     var todayTab=document.querySelector('#tabbar button[data-tab="today"][aria-selected="true"]');
-    if ((youTab && !view.querySelector('.ritual-v2-profile')) || (todayTab && !view.querySelector('.ritual-hero'))) {
+    if ((youTab && !view.querySelector('.ritual-v2-profile')) || (todayTab && !view.querySelector('.ritual-challenge'))) {
       renderEnhancement();
     }
   });
