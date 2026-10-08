@@ -127,6 +127,19 @@
       .ritual-v2-stat b{display:block;font:700 19px var(--font-d)}
       .ritual-v2-stat span{font-size:9.5px;color:var(--muted)}
       .ritual-v2-perm{margin-top:12px;padding:12px;border-radius:14px;background:var(--bg);border:1px solid var(--line);font-size:12px}
+      .ritual-hero{position:relative;display:grid;grid-template-columns:minmax(0,1fr) 132px;gap:8px;align-items:stretch;overflow:hidden;margin-bottom:16px;padding:20px;border:1px solid var(--line);border-radius:24px;background:radial-gradient(circle at 82% 24%,rgba(183,243,107,.16),transparent 32%),linear-gradient(145deg,#111713,#0D120F 68%,#182319);box-shadow:0 14px 38px rgba(0,0,0,.18)}
+      .ritual-hero:after{content:"";position:absolute;inset:auto -35px -55px auto;width:170px;height:170px;border-radius:50%;border:1px solid rgba(183,243,107,.16);box-shadow:0 0 0 24px rgba(183,243,107,.035),0 0 0 48px rgba(183,243,107,.02);pointer-events:none}
+      .ritual-hero-copy{position:relative;z-index:2;min-width:0;display:flex;flex-direction:column;justify-content:center}
+      .ritual-hero-kicker{font:700 10px/1 var(--font-m);letter-spacing:.16em;color:var(--accent);text-transform:uppercase;margin-bottom:8px}
+      .ritual-hero-title{font:800 clamp(24px,7vw,34px)/.98 var(--font-d);letter-spacing:-.035em}
+      .ritual-hero-sub{margin-top:8px;color:var(--muted);font-size:12px;line-height:1.45;max-width:260px}
+      .ritual-hero-progress{height:7px;margin-top:14px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden}
+      .ritual-hero-progress span{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,var(--accent),#E7FFB5);transition:width .35s ease}
+      .ritual-hero-meta{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+      .ritual-hero-chip{padding:7px 9px;border-radius:10px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.07);font:700 10px var(--font-m);color:var(--fg)}
+      .ritual-hero-character{position:relative;z-index:2;display:grid;place-items:center;min-width:0}
+      .ritual-hero-character svg{width:128px;height:170px;display:block;filter:drop-shadow(0 18px 20px rgba(0,0,0,.3))}
+      .ritual-hero-level{position:absolute;right:5px;top:3px;padding:6px 8px;border-radius:9px;background:var(--accent);color:var(--accent-ink);font:800 9px var(--font-m);letter-spacing:.06em}
       .ritual-v2-modal{position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.62);display:grid;place-items:center;padding:18px}
       .ritual-v2-modal[hidden]{display:none}
       .ritual-v2-dialog{width:min(100%,390px);max-height:90dvh;overflow:auto;background:var(--surface);color:var(--fg);border:1px solid var(--line);border-radius:24px;padding:20px}
@@ -280,6 +293,64 @@
     }
   }
 
+  function heroData(){
+    var s=getState(), logs=s.log||{}, habits=Array.isArray(s.habits)?s.habits:[], today=dateKey();
+    var totalXp=0, totalCompletions=0;
+    Object.keys(logs).forEach(function(day){
+      var row=logs[day]||{};
+      Object.keys(row).forEach(function(id){
+        if(!row[id]) return;
+        var h=habits.find(function(x){return x&&x.id===id;});
+        totalXp += h && h.xp ? h.xp : 10;
+        totalCompletions++;
+      });
+    });
+    var active=habits.filter(function(h){return h&&!h.archived;});
+    var done=(logs[today]||{});
+    var scheduled=active.filter(function(h){
+      var ds=Array.isArray(h.days)?h.days:[0,1,2,3,4,5,6];
+      return ds.indexOf(new Date(today+'T12:00:00').getDay())>=0;
+    });
+    var complete=scheduled.filter(function(h){return !!done[h.id];}).length;
+    var level=Math.floor(Math.sqrt(totalXp/60))+1;
+    var floor=60*Math.pow(level-1,2), next=60*Math.pow(level,2);
+    var pct=Math.max(0,Math.min(100,Math.round((totalXp-floor)/(next-floor)*100)));
+    var st=stats();
+    var rank=st.current>=30?'Relentless':st.current>=14?'Disciplined':st.current>=7?'Momentum':'The Keeper';
+    return {xp:totalXp,level:level,pct:pct,next:next,complete:complete,scheduled:scheduled.length,streak:st.current,total:totalCompletions,rank:rank};
+  }
+
+  function heroCharacter(d){
+    var glow=d.level>=10?'#F4C76A':d.level>=5?'#86B8FF':'#B7F36B';
+    return '<svg viewBox="0 0 180 220" role="img" aria-label="Ritual Keeper character">'+
+      '<defs><radialGradient id="rhg" cx="50%" cy="35%" r="70%"><stop offset="0" stop-color="'+glow+'" stop-opacity=".32"/><stop offset="1" stop-color="'+glow+'" stop-opacity="0"/></radialGradient></defs>'+
+      '<circle cx="90" cy="94" r="82" fill="url(#rhg)"/>'+ 
+      '<path d="M43 192c5-39 24-57 47-57s42 18 47 57" fill="#111713" stroke="'+glow+'" stroke-width="3"/>'+ 
+      '<path d="M57 139c-8-29-3-70 33-83 36 13 41 54 33 83l-16 16H73z" fill="#19211C" stroke="#F4F5F1" stroke-opacity=".22" stroke-width="2"/>'+ 
+      '<path d="M69 91c7-25 35-31 46-4v24c-10 13-29 14-46 0z" fill="#090D0B" stroke="'+glow+'" stroke-width="2"/>'+ 
+      '<path d="M78 103h6M96 103h6" stroke="#F4F5F1" stroke-width="4" stroke-linecap="round"/>'+ 
+      '<path d="M61 132l-20 19M119 132l20 19" stroke="#F4F5F1" stroke-opacity=".32" stroke-width="8" stroke-linecap="round"/>'+ 
+      '<path d="M73 172h34" stroke="'+glow+'" stroke-width="4" stroke-linecap="round"/>'+ 
+      '<circle cx="90" cy="172" r="8" fill="'+glow+'" fill-opacity=".18" stroke="'+glow+'" stroke-width="2"/>'+ 
+      '</svg>';
+  }
+
+  function heroCard(){
+    var d=heroData();
+    var left=Math.max(0,d.scheduled-d.complete);
+    var directive=left===0?'Quest cleared. You showed up.':left===1?'One more move. Finish the chain.':left+' moves left. Keep the chain alive.';
+    return '<section class="ritual-hero" aria-label="Ritual Keeper progress">'+
+      '<div class="ritual-hero-copy">'+
+        '<div class="ritual-hero-kicker">Your daily arc</div>'+ 
+        '<div class="ritual-hero-title">'+escapeHtml(d.rank)+'</div>'+ 
+        '<div class="ritual-hero-sub">'+escapeHtml(directive)+' Progress is local, instant, and yours.</div>'+ 
+        '<div class="ritual-hero-progress" aria-label="'+d.pct+' percent to next level"><span style="width:'+d.pct+'%"></span></div>'+ 
+        '<div class="ritual-hero-meta"><span class="ritual-hero-chip">LVL '+d.level+'</span><span class="ritual-hero-chip">'+d.xp+' XP</span><span class="ritual-hero-chip">'+d.complete+'/'+d.scheduled+' today</span></div>'+ 
+      '</div>'+ 
+      '<div class="ritual-hero-character"><span class="ritual-hero-level">KEEPER</span>'+heroCharacter(d)+'</div>'+ 
+      '</section>';
+  }
+
   function profileCard(){
     var p=getProfile(), st=stats();
     var name=p.name||'Create your profile';
@@ -302,37 +373,45 @@
   function renderEnhancement(){
     injectStyles();
     var view=document.getElementById('view');
-    var tab=document.querySelector('#tabbar button[data-tab="you"][aria-selected="true"]');
-    if(!view||!tab) return;
+    var youTab=document.querySelector('#tabbar button[data-tab="you"][aria-selected="true"]');
+    var todayTab=document.querySelector('#tabbar button[data-tab="today"][aria-selected="true"]');
+    if(!view) return;
 
-    if (view.querySelector('.ritual-v2-profile')) return;
+    if (youTab && !view.querySelector('.ritual-v2-profile')) {
+      view.insertAdjacentHTML('afterbegin',profileCard());
+      var card=view.querySelector('.ritual-v2-profile');
+      if(card){
+        var edit=card.querySelector('[data-rv-edit]');
+        var share=card.querySelector('[data-rv-share]');
+        var reminders=card.querySelector('[data-rv-reminders]');
+        var backup=card.querySelector('[data-rv-backup]');
+        if(edit) edit.onclick=editProfile;
+        if(share) share.onclick=shareAchievement;
+        if(reminders) reminders.onclick=reminderSettings;
+        if(backup) backup.onclick=function(){
+          var s=getState(), p=getProfile();
+          var payload=Object.assign({},s,{profile:p,profileBackupVersion:2});
+          var blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
+          var url=URL.createObjectURL(blob);
+          var a=document.createElement('a');a.href=url;a.download='ritual-profile-backup-'+dateKey(new Date())+'.json';document.body.appendChild(a);a.click();a.remove();
+          setTimeout(function(){URL.revokeObjectURL(url);},1500);toast('Backup downloaded');
+        };
+      }
+    }
 
-    view.insertAdjacentHTML('afterbegin',profileCard());
-    var card=view.querySelector('.ritual-v2-profile');
-    if(!card) return;
-
-    var edit=card.querySelector('[data-rv-edit]');
-    var share=card.querySelector('[data-rv-share]');
-    var reminders=card.querySelector('[data-rv-reminders]');
-    var backup=card.querySelector('[data-rv-backup]');
-    if(edit) edit.onclick=editProfile;
-    if(share) share.onclick=shareAchievement;
-    if(reminders) reminders.onclick=reminderSettings;
-    if(backup) backup.onclick=function(){
-      var s=getState(), p=getProfile();
-      var payload=Object.assign({},s,{profile:p,profileBackupVersion:2});
-      var blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
-      var url=URL.createObjectURL(blob);
-      var a=document.createElement('a');a.href=url;a.download='ritual-profile-backup-'+dateKey(new Date())+'.json';document.body.appendChild(a);a.click();a.remove();
-      setTimeout(function(){URL.revokeObjectURL(url);},1500);toast('Backup downloaded');
-    };
+    if (todayTab && !view.querySelector('.ritual-hero')) {
+      view.insertAdjacentHTML('afterbegin',heroCard());
+    }
   }
 
   var observer=new MutationObserver(function(){
     var view=document.getElementById('view');
     if (!view) return;
-    var tab=document.querySelector('#tabbar button[data-tab="you"][aria-selected="true"]');
-    if (tab && !view.querySelector('.ritual-v2-profile')) renderEnhancement();
+    var youTab=document.querySelector('#tabbar button[data-tab="you"][aria-selected="true"]');
+    var todayTab=document.querySelector('#tabbar button[data-tab="today"][aria-selected="true"]');
+    if ((youTab && !view.querySelector('.ritual-v2-profile')) || (todayTab && !view.querySelector('.ritual-hero'))) {
+      renderEnhancement();
+    }
   });
 
   function boot(){
