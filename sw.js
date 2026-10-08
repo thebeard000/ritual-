@@ -1,5 +1,5 @@
 /* Ritual service worker — offline PWA shell. Native Android builds use Capacitor. */
-const CACHE = 'ritual-v3';
+const CACHE = 'ritual-v4';
 const ASSETS = [
   './','./index.html','./ritual-v2.js','./manifest.webmanifest',
   './icon-192.png','./icon-512.png','./brand/ritual-mark.svg','./brand/ritual-wordmark.svg'
