@@ -1,9 +1,1 @@
-{
-  "appId": "com.ritual.habittracker",
-  "appName": "Ritual",
-  "webDir": "www",
-  "backgroundColor": "#090D0B",
-  "android": {
-    "backgroundColor": "#090D0B"
-  }
-}
+{"appId":"com.forge.challenge","appName":"Forge","webDir":"dist","backgroundColor":"#090b0a","android":{"backgroundColor":"#090b0a"}}

@@ -1,0 +1,12 @@
+export const todayKey=(d=new Date())=>dateKey(d);
+export const dateKey=d=>{const x=new Date(d);return[x.getFullYear(),String(x.getMonth()+1).padStart(2,"0"),String(x.getDate()).padStart(2,"0")].join("-")};
+export const parseKey=k=>new Date(k+"T00:00:00");
+export const addDays=(k,n)=>{const d=parseKey(k);d.setDate(d.getDate()+n);return dateKey(d)};
+export const daysBetween=(a,b)=>Math.round((parseKey(b)-parseKey(a))/86400000);
+export const formatDate=d=>new Intl.DateTimeFormat("en-IN",{day:"numeric",month:"short",year:"numeric"}).format(d);
+export const getDay=(s,k)=>({...{done:[]},...(s.days?.[k]||{})});
+export const completionForDay=(s,k)=>{const h=s.habits.length;return h?Math.round(getDay(s,k).done.length/h*100):0};
+export const getChallengeDay=s=>s.profile?Math.max(1,Math.min(s.profile.duration,daysBetween(s.profile.startDate,todayKey())+1)):0;
+export const recentDays=(s,n=14)=>Array.from({length:n},(_,i)=>{const k=addDays(todayKey(),-(n-1-i));return{key:k,pct:completionForDay(s,k)}});
+export const getStreak=s=>{let n=0;for(let i=0;i<10000;i++){const k=addDays(todayKey(),-i);if(completionForDay(s,k)>=100)n++;else if(i>0)break}return n};
+export const getMetrics=s=>{const day=getChallengeDay(s),hist=recentDays(s,Math.min(14,day)),all=Object.entries(s.days||{}).filter(([k])=>k>=s.profile.startDate),completed=all.filter(([,d])=>d.done?.length===s.habits.length).length,actions=all.reduce((a,[,d])=>a+(d.done?.length||0),0),rates={};s.habits.forEach(h=>{let c=0,t=0;all.forEach(([,d])=>{t++;if(d.done?.includes(h.id))c++});rates[h.id]=t?c/t*100:0});const strongest=s.habits.slice().sort((a,b)=>(rates[b.id]||0)-(rates[a.id]||0))[0],streak=getStreak(s),best=Math.max(streak,...all.map(([k])=>{let n=0;for(let i=0;i<1000;i++){if(completionForDay(s,addDays(k,-i))>=100)n++;else break}return n}));return{day,arcProgress:Math.min(100,day/s.profile.duration*100),completedDays:completed,consistency:Math.round(completed/Math.max(1,day)*100),totalActions:actions,momentum:Math.round(hist.reduce((a,x)=>a+x.pct,0)/hist.length),streak,bestStreak:best,habitRates:rates,strongest,comebacks:s.comebacks||0,xp:s.xp,level:Math.floor(s.xp/250)+1,levelTitle:["Starter","Builder","Operator","Keeper","Anchor"][Math.min(4,Math.floor(s.xp/250))]}};

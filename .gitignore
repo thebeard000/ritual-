@@ -1,9 +1,0 @@
-node_modules/
-www/
-android/
-*.keystore
-*.jks
-*.apk
-*.aab
-.env
-.DS_Store
