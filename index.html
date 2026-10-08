@@ -11,16 +11,14 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#0B0E13" />
-  <title>Ritual — daily habit tracker</title>
+  <title>Ritual</title>
   <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" type="image/svg+xml" href="brand/ritual-mark.svg" />
   <link rel="apple-touch-icon" href="icon-192.png" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-title" content="Ritual" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" />
   <script>
     (function () {
       try {
@@ -536,6 +534,70 @@
 
     @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
   </style>
+
+<style id="ritual-native-shell">
+:root{
+ --bg:#090D0B;--surface:#101815;--surface2:#18231D;--line:#29352F;--fg:#F3EFE5;--muted:#8E9B93;
+ --accent:#9AD9A9;--accent-ink:#08110B;--accent-soft:#173B28;--amber:#EAB66F;--amber-soft:#493621;
+ --coral:#E67A78;--coral-soft:#432527;--sky:#80B8E8;--sky-soft:#183247;--teal:#62C6B2;
+ --font-d:"Avenir Next","SF Pro Display","Segoe UI Variable","Segoe UI",system-ui,sans-serif;
+ --font-b:"Avenir Next","SF Pro Text","Segoe UI Variable","Segoe UI",system-ui,sans-serif;
+ --font-m:"SF Mono","JetBrains Mono",ui-monospace,Consolas,monospace
+}
+html[data-theme="light"]{
+ --bg:#F4F1E8;--surface:#FFFCF5;--surface2:#EEEAE0;--line:#D8D1C2;--fg:#18201B;--muted:#6B766F;
+ --accent:#2E8752;--accent-ink:#F8FFF9;--accent-soft:#DCEFE2;--amber:#9B6A2B;--amber-soft:#F2E3C9;
+ --coral:#B94D4A;--coral-soft:#F3D9D8;--sky:#386E9D;--sky-soft:#DDE9F4;--teal:#2D8478
+}
+html,body{width:100%;min-height:100%;margin:0;background:var(--bg)}
+body{
+ min-height:100dvh;
+ background:radial-gradient(circle at 20% -8%,rgba(154,217,169,.08),transparent 34%),radial-gradient(circle at 88% 20%,rgba(128,184,232,.055),transparent 28%),var(--bg);
+ color:var(--fg);font-family:var(--font-b);overflow:hidden
+}
+[data-phone-shell],[data-phone-screen],[data-phone-content],.status-bar,.punch-hole,.gesture-indicator,.hardware-button{display:none!important}
+#app[data-app-shell]{display:flex;flex-direction:column;width:100%;height:100dvh;min-height:100dvh;background:var(--bg);color:var(--fg)}
+.app-main{
+ flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior-y:contain;-webkit-overflow-scrolling:touch;scrollbar-width:none;
+ padding:calc(env(safe-area-inset-top,0px) + 18px) 18px calc(env(safe-area-inset-bottom,0px) + 28px)
+}
+.app-main::-webkit-scrollbar{display:none}
+.tabbar{
+ position:relative;z-index:10;flex:none;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:2px;
+ background:color-mix(in srgb,var(--surface) 94%,transparent);border-top:1px solid var(--line);
+ padding:8px 7px calc(env(safe-area-inset-bottom,0px) + 8px);box-shadow:0 -10px 30px rgba(0,0,0,.14);
+ backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)
+}
+.tabbar[hidden]{display:none}
+.tabbar button{
+ min-height:52px;display:grid;justify-items:center;align-content:center;gap:5px;border:0;background:transparent;color:var(--muted);
+ border-radius:14px;padding:6px 2px;font:700 10px/1 var(--font-b);letter-spacing:.01em;-webkit-tap-highlight-color:transparent
+}
+.tabbar button .ic{width:21px;height:21px}
+.tabbar button[aria-selected="true"]{color:var(--accent);background:color-mix(in srgb,var(--accent-soft) 70%,transparent)}
+.scrim{position:fixed;inset:0;z-index:40;background:rgba(0,0,0,.56);opacity:0;transition:opacity .22s ease;pointer-events:none}
+.scrim.open{opacity:1;pointer-events:auto}
+.sheet{
+ position:fixed;left:0;right:0;bottom:0;z-index:41;background:var(--surface);color:var(--fg);
+ border-radius:24px 24px 0 0;border-top:1px solid var(--line);
+ padding:12px 18px calc(env(safe-area-inset-bottom,0px) + 22px);max-height:min(86dvh,820px);
+ overflow-y:auto;overscroll-behavior:contain;transform:translateY(112%);transition:transform .28s cubic-bezier(.2,.85,.25,1);
+ box-shadow:0 -24px 70px rgba(0,0,0,.22)
+}
+.sheet.open{transform:translateY(0)}
+.toast{
+ position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 84px);z-index:50;
+ transform:translate(-50%,12px);opacity:0;pointer-events:none;background:var(--fg);color:var(--bg);
+ padding:11px 16px;border-radius:14px;font:700 13px/1.3 var(--font-b);max-width:min(88%,420px);
+ text-align:center;transition:opacity .2s,transform .2s;box-shadow:0 12px 32px rgba(0,0,0,.22)
+}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.brand-mark-img{width:84px;height:84px;display:block;margin:0 auto 16px;border-radius:24px;box-shadow:0 16px 34px rgba(0,0,0,.24)}
+.brandbig{text-align:center}.brandbig h1{letter-spacing:-.035em}
+.onboard{min-height:calc(100dvh - 44px);display:grid;align-content:center;gap:26px;max-width:520px;margin:0 auto;padding:10px 0 28px}
+button,.btn,.iconbtn,.ico,.chip,.hrow,.lvlcard{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+@media (min-width:760px){.app-main{padding-left:24px;padding-right:24px}#view{max-width:760px;width:100%;margin-inline:auto}}
+</style>
 </head>
 <body>
   <div id="app" data-app-shell>
