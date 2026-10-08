@@ -12,9 +12,9 @@ const checks = [
   ["ritual-v2.js", /ritual-hero/],
   ["ritual-v2.js", /ritual\.challenge\.v1/],
   ["ritual-v2.js", /shareRecap/],
-  ["ritual-v2.js", /RITUAL \\'\+r\.year/],
+  ["ritual-v2.js", /c\.fillText\('RITUAL '\+r\.year/],
   ["ritual-v2.js", /youTab && !view\.querySelector\('\.ritual-v2-profile'\)/],
-  ["ritual-v2.js", /todayTab && !view\.querySelector\('\.ritual-hero'\)/],
+  ["ritual-v2.js", /todayTab && !view\.querySelector\('\.ritual-challenge'\)/],
   ["ritual-v2.js", /new MutationObserver/],
   ["sw.js", /ritual-v5/],
   ["capacitor.config.json", /com\.ritual\.habittracker/]
