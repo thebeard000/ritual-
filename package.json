@@ -1,0 +1,23 @@
+{
+  "name": "ritual-habit-tracker",
+  "version": "1.1.0",
+  "private": true,
+  "description": "Ritual — local-first habit tracker, PWA and Android app.",
+  "scripts": {
+    "prepare:web": "node scripts/prepare-web.mjs",
+    "android:add": "npm run prepare:web && npx cap add android",
+    "android:sync": "npm run prepare:web && npx cap sync android",
+    "android:build": "npm run android:sync && cd android && ./gradlew assembleDebug",
+    "android:open": "npm run prepare:web && npx cap open android",
+    "assets:android": "npx @capacitor/assets generate --android --assetPath assets",
+    "verify:web": "node scripts/verify.mjs"
+  },
+  "dependencies": {
+    "@capacitor/android": "8.5.2",
+    "@capacitor/core": "8.5.2"
+  },
+  "devDependencies": {
+    "@capacitor/assets": "3.0.5",
+    "@capacitor/cli": "8.5.2"
+  }
+}
