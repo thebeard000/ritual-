@@ -1,8 +1,9 @@
 /* Ritual service worker — offline app shell for installable PWA */
-const CACHE = 'ritual-v1';
+const CACHE = 'ritual-v2';
 const ASSETS = [
   './',
   './index.html',
+  './ritual-v2.js',
   './manifest.webmanifest',
   './icon-192.png',
   './icon-512.png'
