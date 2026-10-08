@@ -4,6 +4,8 @@ const checks = [
   ["index.html", /id="app"/],
   ["index.html", /env\(safe-area-inset-top/],
   ["index.html", /data-app-shell/],
+  ["index.html", /Legacy prototype selectors are intentionally inert/],
+  ["index.html", /prefers-reduced-motion/],
   ["manifest.webmanifest", /"short_name"\s*:\s*"Ritual"/],
   ["manifest.webmanifest", /"display"\s*:\s*"standalone"/],
   ["ritual-v2.js", /ritual\.profile\.v2/],
