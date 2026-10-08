@@ -897,11 +897,11 @@ button,.btn,.iconbtn,.ico,.chip,.hrow,.lvlcard{-webkit-tap-highlight-color:trans
       }).join('');
       var any = Object.keys(ob.areas).some(function (a) { return ob.areas[a]; });
       return '<section class="onboard">' +
-        '<div class="brandbig"><span class="logo">' + icon('sparkles') + '</span><h1>Ritual</h1>' +
+        '<div class="brandbig"><img class="brand-mark-img" src="brand/ritual-mark.svg" alt="Ritual logo"><h1>Ritual</h1>' +
         '<p class="lede">Small habits, kept daily. Choose what matters, check in each day, and watch your follow-through build.</p></div>' +
         '<div><p class="eyebrow">What do you want to work on</p><div class="chips" style="margin-top:12px">' + chips + '</div></div>' +
         '<div><p class="eyebrow">How much per day</p><div class="stack" style="margin-top:12px">' + lv + '</div></div>' +
-        '<button class="btn block" data-act="begin"' + (any ? '' : ' disabled') + '>' + icon('arrowr') + ' Start day one</button>' +
+        '<button class="btn block" aria-label="Start Ritual day one" data-act="begin"' + (any ? '' : ' disabled') + '>' + icon('arrowr') + ' Start day one</button>' +
         '<p class="small muted" style="text-align:center">Your data stays on this device.</p>' +
         '</section>';
     }
@@ -1085,9 +1085,12 @@ button,.btn,.iconbtn,.ico,.chip,.hrow,.lvlcard{-webkit-tap-highlight-color:trans
         themes.map(function (t) { return '<button data-act="theme" data-v="' + t[0] + '" aria-pressed="' + (S.theme === t[0]) + '">' + t[1] + '</button>'; }).join('') +
         '</div></div>' +
 
-        '<div class="block"><h3>Install as app</h3><p class="about" style="margin-bottom:12px">Add Ritual to your home screen and it runs full-screen, offline, like a native app. No store needed.</p>' +
-        '<button class="btn block" data-act="install">' + icon('download') + ' Install app</button>' +
-        '<p class="small muted" id="install-note" style="margin-top:10px">If the button does nothing, open your browser menu and choose <b>Add to Home screen</b>.</p></div>' +
+        '<div class="block"><h3>' + (typeof window.Capacitor !== 'undefined' ? 'Ritual is installed' : 'Install as app') + '</h3><p class="about" style="margin-bottom:12px">' +
+        (typeof window.Capacitor !== 'undefined' ? 'You are running the full Android app shell. Your Ritual data stays on this device.' : 'Add Ritual to your home screen for a standalone, offline experience. No account or subscription is required.') +
+        '</p>' +
+        (typeof window.Capacitor !== 'undefined' ? '<div class="banner good">' + icon('check') + '<span><b>Native app mode.</b> Android supplies the real status and navigation bars.</span></div>' :
+          '<button class="btn block" data-act="install">' + icon('download') + ' Install Ritual</button><p class="small muted" id="install-note" style="margin-top:10px">You can also use your browser menu → Add to Home screen.</p>') +
+        '</div>' +
 
         '<div class="block"><h3>Your data</h3><p class="about" style="margin-bottom:12px">Stored on this device only. Export a backup now and then so nothing is lost.</p>' +
         '<div class="od-row"><button class="btn ghost od-fill" data-act="export">' + icon('download') + ' Backup</button>' +
