@@ -10,8 +10,8 @@ const checks = [
   ["manifest.webmanifest", /"display"\s*:\s*"standalone"/],
   ["ritual-v2.js", /ritual\.profile\.v2/],
   ["ritual-v2.js", /ritual-hero/],
-  ["ritual-v2.js", /!view\.querySelector\('\.ritual-v2-profile'\)/],
-  ["ritual-v2.js", /!view\.querySelector\('\.ritual-hero'\)/],
+  ["ritual-v2.js", /youTab && !view\.querySelector\('\.ritual-v2-profile'\)/],
+  ["ritual-v2.js", /todayTab && !view\.querySelector\('\.ritual-hero'\)/],
   ["ritual-v2.js", /new MutationObserver/],
   ["sw.js", /ritual-v5/],
   ["capacitor.config.json", /com\.ritual\.habittracker/]
