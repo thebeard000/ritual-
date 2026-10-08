@@ -67,42 +67,87 @@
       .od-spacer { flex: none; visibility: hidden; pointer-events: none; }
       .od-touch  { min-width: 44px; min-height: 44px; }
     }
+    /* RITUAL PREMIUM SYSTEM v2 — platform-neutral, mobile-first, iOS/PWA/Android safe */
+    *,*::before,*::after{box-sizing:border-box}
+    html{min-height:100%;background:var(--bg);-webkit-text-size-adjust:100%;text-rendering:optimizeLegibility}
+    body{margin:0;min-width:320px;min-height:100dvh;background:var(--bg);color:var(--fg);-webkit-tap-highlight-color:transparent}
+    body,button,input,select,textarea{font-synthesis:none}
+    button,a,[role="button"],input,select,textarea{-webkit-tap-highlight-color:transparent}
+    button{touch-action:manipulation}
+    @media (prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}}
+    @media (min-width:760px){
+      body{overflow:auto}
+      #app{max-width:760px;min-height:100dvh;margin:0 auto}
+      .app-main{padding-inline:24px}
+    }
+    @media (min-width:1100px){
+      body{background:color-mix(in srgb,var(--bg) 92%,#fff 8%)}
+      #app{box-shadow:0 0 80px rgba(0,0,0,.08)}
+    }
+    @supports not (height:100dvh){body,#app{min-height:100vh}}
+    @supports (padding:max(0px)){
+      .app-main{padding-left:max(18px,env(safe-area-inset-left));padding-right:max(18px,env(safe-area-inset-right))}
+    }
+    .phone-content{width:100%;min-height:100dvh;background:var(--bg)}
+    #app{width:100%;min-height:100dvh}
+    .app-main{padding-top:max(18px,env(safe-area-inset-top));padding-bottom:max(28px,calc(env(safe-area-inset-bottom) + 28px))}
+    .bottom-nav{padding-bottom:max(8px,env(safe-area-inset-bottom))}
+    .card,.hrow,.hcard,.callout{box-shadow:0 1px 1px rgba(0,0,0,.08)}
+    .btn,.iconbtn,.ico,.chip,.daybtn,.seg button{user-select:none}
+    .btn:active,.iconbtn:active,.ico:active,.daybtn:active,.chip:active{transform:scale(.98)}
+    .btn,.iconbtn,.ico,.daybtn,.chip{transition:transform .14s ease,background-color .18s ease,border-color .18s ease,opacity .18s ease}
+    .btn:focus-visible,.iconbtn:focus-visible,.ico:focus-visible,.daybtn:focus-visible,.chip:focus-visible{outline:3px solid color-mix(in srgb,var(--accent) 45%,transparent);outline-offset:2px}
+    .input::placeholder,textarea::placeholder{color:var(--muted);opacity:.72}
+    .hrow,.hcard,.card,.callout{overflow:hidden}
+    .section-head h2{font-size:clamp(24px,6vw,30px)}
+    .h-date{font-size:clamp(22px,5.8vw,27px)}
+    .herocard{padding:clamp(4px,2vw,10px)}
+    .ringwrap{width:clamp(156px,44vw,188px);height:clamp(156px,44vw,188px)}
+    .ringmid b{font-size:clamp(36px,10vw,46px)}
+    @media (max-width:380px){
+      .app-main{padding-left:14px;padding-right:14px}
+      .card{padding:15px}
+      .hrow{padding:11px 12px}
+      .statstrip{gap:6px}
+      .stat{padding:10px 5px}
+    }
+
     /* /OD-LAYOUT-PRIMITIVES v1 */
 
     :root {
-      --bg: #0B0E13;
-      --surface: #141A23;
-      --surface2: #1E2733;
-      --line: #2A3542;
-      --fg: #EEF2F7;
-      --muted: #8C99AA;
-      --accent: #3DDC97;
-      --accent-ink: #04150E;
-      --accent-soft: #123A2B;
-      --amber: #FFB454;
+      --bg: #090D0B;
+      --surface: #111713;
+      --surface2: #19211C;
+      --line: #28312B;
+      --fg: #F4F5F1;
+      --muted: #8F9A92;
+      --accent: #B7F36B;
+      --accent-ink: #0B1208;
+      --accent-soft: #1D3219;
+      --amber: #F4C76A;
       --amber-soft: #4A3413;
       --coral: #FF6B6B;
       --coral-soft: #3A1F1F;
-      --sky: #5AA9FF;
+      --sky: #86B8FF;
       --sky-soft: #18324F;
-      --teal: #2DD4BF;
+      --teal: #70E2C9;
       --font-d: 'Space Grotesk', 'Segoe UI', system-ui, sans-serif;
       --font-b: 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
       --font-m: 'JetBrains Mono', ui-monospace, Consolas, monospace;
-      --phone-system-fg: #EEF2F7;
-      --phone-screen-bg: #0B0E13;
+      --phone-system-fg: #F4F5F1;
+      --phone-screen-bg: #090D0B;
       color-scheme: dark;
     }
     html[data-theme="light"] {
-      --bg: #F3F5F7;
+      --bg: #F6F4ED;
       --surface: #FFFFFF;
       --surface2: #E7ECF1;
-      --line: #D2DAE2;
-      --fg: #111820;
-      --muted: #5B6875;
-      --accent: #0E8A5F;
+      --line: #D9D5C9;
+      --fg: #182018;
+      --muted: #657067;
+      --accent: #527F25;
       --accent-ink: #FFFFFF;
-      --accent-soft: #CDEEE0;
+      --accent-soft: #E0EACF;
       --amber: #9A6414;
       --amber-soft: #F4E3C4;
       --coral: #C2362F;
@@ -111,7 +156,7 @@
       --sky-soft: #D6E6FB;
       --teal: #0F8A7C;
       --phone-system-fg: #111820;
-      --phone-screen-bg: #F3F5F7;
+      --phone-screen-bg: #F6F4ED;
       color-scheme: light;
     }
 
@@ -132,7 +177,7 @@
     .app-main {
       flex: 1 1 auto; min-height: 0;
       overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; scrollbar-width: none;
-      padding: calc(var(--phone-safe-top) + 10px) 18px 26px;
+      padding: 18px 18px 26px; padding-top: max(18px,env(safe-area-inset-top));
     }
     .app-main::-webkit-scrollbar { display: none; }
 
@@ -358,6 +403,12 @@
   </style>
 
 <style id="ritual-native-shell">
+/* Platform-safe native web shell: no simulated status bar or device chrome. */
+*,*::before,*::after{box-sizing:border-box}
+html,body{min-height:100dvh}
+body{overflow-x:hidden}
+#app[data-app-shell]{min-height:100dvh;width:100%}
+@supports(padding:max(0px)){#app[data-app-shell]{padding-left:max(0px,env(safe-area-inset-left));padding-right:max(0px,env(safe-area-inset-right))}}
 /* Real-device shell: system UI is supplied by Android/browser, never simulated in Ritual. */
 *,*::before,*::after{box-sizing:border-box}
 img,svg{max-width:100%}
