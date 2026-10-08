@@ -25,7 +25,7 @@ The APK is a real Android application using Capacitor's native container. It doe
 
 ## Local Android build
 
-Requirements: Node.js 22+, Android Studio/SDK, Java 17.
+Requirements: Node.js 22+, Android Studio/SDK, Java 21.
 
 ```bash
 npm install
