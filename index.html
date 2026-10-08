@@ -359,6 +359,9 @@
 
 <style id="ritual-native-shell">
 /* Real-device shell: system UI is supplied by Android/browser, never simulated in Ritual. */
+*,*::before,*::after{box-sizing:border-box}
+img,svg{max-width:100%}
+button,input,select,textarea{box-sizing:border-box}
 :root{--app-max-width:760px;--app-gutter:18px}
 html,body{overflow:hidden;overscroll-behavior:none}
 body{margin:0;min-height:100dvh;width:100%;background:var(--bg)}
