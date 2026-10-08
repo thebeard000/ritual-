@@ -255,7 +255,10 @@
       '</section>';
   }
 
+  var renderingEnhancement = false;
   function renderEnhancement(){
+    if (renderingEnhancement) return;
+    renderingEnhancement = true;
     injectStyles();
     var view=document.getElementById('view'), tab=document.querySelector('#tabbar button[data-tab="you"][aria-selected="true"]');
     if(!view||!tab)return;
@@ -272,6 +275,7 @@
       var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='ritual-profile-backup-'+dateKey(new Date())+'.json';document.body.appendChild(a);a.click();a.remove();
       setTimeout(function(){URL.revokeObjectURL(a.href);},1500);toast('Backup downloaded');
     };
+    renderingEnhancement = false;
   }
 
   /* Attach to the existing app without replacing its renderer. */
