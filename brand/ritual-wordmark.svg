@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 180">
+  <g transform="translate(18 18) scale(.14)">
+    <rect x="24" y="24" width="976" height="976" rx="226" fill="#0B100D"/>
+    <path d="M244 804V220h330c160 0 250 82 250 210 0 112-81 198-230 206l222 168H680L496 651H376v153zM376 340v176h181c81 0 135-33 135-87 0-57-52-89-135-89z" fill="#F3EFE5"/>
+    <path d="M343 645c8-118 82-216 212-264 61-23 118-33 164-31-12 91-58 170-133 218-67 43-143 62-243 77z" fill="#9AD9A9"/>
+  </g>
+  <text x="176" y="118" fill="#F3EFE5" font-family="Arial, Helvetica, sans-serif" font-size="76" font-weight="700" letter-spacing="16">RITUAL</text>
+</svg>
